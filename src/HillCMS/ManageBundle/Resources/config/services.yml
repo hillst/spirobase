@@ -1,0 +1,7 @@
+parameters:
+#    hill_cms_manage.example.class: HillCMS\ManageBundle\Example
+
+services:
+#    hill_cms_manage.example:
+#        class: %hill_cms_manage.example.class%
+#        arguments: [@service_id, "plain_value", %parameter%]

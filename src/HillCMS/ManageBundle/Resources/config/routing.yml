@@ -1,0 +1,6 @@
+manage:
+    pattern: /manage
+    defaults: { _controller: HillCMSManageBundle:Default:index}
+save:
+    pattern: /manage/save
+    defaults: {_controller: HillCMSManageBundle:Default:save} 

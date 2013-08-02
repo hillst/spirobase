@@ -1,0 +1,30 @@
+@CHARSET "UTF-8";
+.carousel {
+		border: #000 2pt solid;
+}
+
+.carousel .container-fluid {
+}
+
+.carousel-control {
+}
+
+.carousel .item {
+}
+
+.carousel img {
+}
+
+.carousel-caption h1,.carousel-caption .lead {
+	margin: 0;
+	line-height: 1.25;
+	color: #fff;
+	text-shadow: 0 1px 1px rgba(0, 0, 0, .4);
+	opacity: 1;
+	font-weight: 300;
+	line-height: 1;
+	letter-spacing: -1px;
+}
+
+.carousel-caption .btn {
+}

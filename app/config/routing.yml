@@ -1,0 +1,16 @@
+hill_cms_manage:
+    resource: "@HillCMSManageBundle/Resources/config/routing.yml"
+    prefix:   /
+
+hill_cms_security:
+    resource: "@HillCMSSecurityBundle/Resources/config/routing.yml"
+    prefix:   /
+
+hill_cms_user:
+    resource: "@HillCMSUserBundle/Resources/config/routing.yml"
+    prefix:   /
+
+hill_cmsccbl:
+    resource: "@HillCMSCCBLBundle/Resources/config/routing.yml"
+    prefix:   /
+

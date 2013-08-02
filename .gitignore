@@ -1,0 +1,4 @@
+app/cache
+app/log
+.project
+app/config/parameters.yml

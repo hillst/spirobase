@@ -1,0 +1,7 @@
+parameters:
+#    hill_cms_user.example.class: HillCMS\UserBundle\Example
+
+services:
+#    hill_cms_user.example:
+#        class: %hill_cms_user.example.class%
+#        arguments: [@service_id, "plain_value", %parameter%]

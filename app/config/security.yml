@@ -1,0 +1,32 @@
+security:
+    encoders:
+        HillCMS\UserBundle\Entity\User:
+            algorithm:        sha1
+            encode_as_base64: true
+            iterations:       1
+
+    role_hierarchy:
+        ROLE_ADMIN:       ROLE_USER
+        ROLE_SUPER_ADMIN: [ ROLE_USER, ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH ]
+
+    providers:
+        administrators:
+            entity: { class: HillCMSUserBundle:User }
+            #entity: { class: HillCMSUserBundle:User, property: username }
+
+    firewalls:
+        admin_area:
+            pattern:    ^/manage
+            http_basic: ~
+            logout: 
+              path: ^/logout
+              target: /
+
+    access_control:
+        # if this app is pushed to production be sure the manage area is all https. basic_auth demands this.
+        #- { path: ^/manage, roles: ROLE_ADMIN, requires_channel: https}
+        - { path: ^/manage, roles: [ROLE_ADMIN, ROLE_USER] }
+        - { path: ^/manage/save, roles: [ROLE_ADMIN, ROLE_USER]}
+        #- { path: ^/cart/checkout, roles: ADMIN, EDITOR, MANAGER, requires_channel: https }
+            
+            

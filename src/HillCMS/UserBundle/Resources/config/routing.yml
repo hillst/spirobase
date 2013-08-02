@@ -1,0 +1,3 @@
+hill_cms_user_homepage:
+    pattern:  /hello/{name}
+    defaults: { _controller: HillCMSUserBundle:Default:index }

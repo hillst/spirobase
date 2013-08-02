@@ -1,0 +1,102 @@
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+<title>Crop Computational Biology Labratory</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content="">
+<!-- Le styles -->
+<link href={{  asset("includes/css/bootstrap.min.css") }} rel="stylesheet" type="text/css" />
+<link
+	href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-responsive.min.css"
+	rel="stylesheet">
+<link href={{  asset("includes/css/Global.css")}} rel="stylesheet" type="text/css" />
+<link rel="icon" type="image/png" href= {{asset("includes/images/favicon.png")}}>
+<!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+<!--[if lt IE 9]>
+            <script src="../assets/js/html5shiv.js"></script>
+        <![endif]-->
+<link rel="shortcut icon" href={{ asset("includes/images/favicon.png")}}>
+<link href={{ asset('includes/images/main.css')}} rel='stylesheet'>
+{% block header %}
+{% endblock %}
+</head>
+
+<body>
+	<!-- NAVBAR -->
+	<div class="navbar-wrapper">
+		<!-- Wrap the .navbar in .container-fluid to center it within the absolutely
+            positioned parent. -->
+		<div class="container-fluid">
+			<div class="navbar navbar-inverse">
+				<div class="navbar-inner">
+					<button type="button" class="btn btn-navbar" data-toggle="collapse"
+						data-target=".nav-collapse">
+						<span class="icon-bar"></span> <span class="icon-bar"></span> <span
+							class="icon-bar"></span>
+
+					</button>
+					<a href="index.php"><img style="padding: 5px; float: left;"
+						src={{  asset("includes/images/logo_0.png") }}>
+					</a>
+					<!-- Responsive Navbar Part 2: Place all navbar contents
+                        you want collapsed withing .navbar-collapse.collapse. -->
+					<div class="nav-collapse collapse">
+					
+						<ul class="nav">
+							
+							{% block nav %}
+							{% set cur = app.request.get('_route') %}
+							<li {% if cur == "home" %} class ="active" {% endif %}>
+								<a href="home">Home</a>
+							</li> 
+							<li {% if cur == "infrastructure"%} class='active' {% endif %}>
+								<a href="infrastructure">Infrastructure</a>
+							</li>
+							<li
+							<li {% if cur == "leadership" %} class = 'active' {% endif %} >
+								<a href="leadership">Leadership</a>
+							</li>
+							<li {% if cur == "people" %} class = 'active' {% endif %} >
+								<a href="people">People</a>
+							</li>
+							{% endblock %}
+						</ul>
+					</div>
+					<!--/.nav-collapse -->
+				</div>
+				<!-- /.navbar-inner -->
+			</div>
+			<!-- /.navbar -->
+		</div>
+		<!-- /.container-fluid -->
+	</div>
+	<!-- /.navbar-wrapper -->
+	{% block body %}
+	{% endblock %}
+	<!-- FOOTER -->
+{% block footer %}
+<div style="position:-50px; position: fixed;"></div>
+<footer>
+	<div class="container-fluid">
+
+		<p class="pull-right" style="padding-right: 2px">
+			<a href="#">Back to top</a>
+		</p>
+		<p style="padding-left: 2px; ">&copy; 2013 Donald Danforth Plant Science
+			Center</p>
+	</div>
+
+</footer>
+
+{% endblock %}
+<!-- /.container -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script
+	src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script
+	src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+{% block javascript %}
+{% endblock %}
+</html>
