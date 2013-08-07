@@ -13,7 +13,6 @@ use Doctrine\Common\Collections\ArrayCollection;
  * @ORM\Entity(repositoryClass="HillCMS\UserBundle\Entity\UserRepository")
  */
 
-// ...
 
 class User implements AdvancedUserInterface, \Serializable
 {
@@ -57,14 +56,14 @@ class User implements AdvancedUserInterface, \Serializable
 	public function __construct()
 	{
 		$this->isActive = true;
-		$this->salt = md5(uniqid(null, true));
-		$this->roles = new ArrayCollection();
+		$this->salt = sha1(uniqid(null, true));
 	}	
 	
 	public function getRoles()
 	{
 		return $this->roles->toArray();
 	}
+	
 	
 	public function isAccountNonExpired(){
 		return TRUE;
@@ -177,7 +176,7 @@ class User implements AdvancedUserInterface, \Serializable
      */
     public function setPassword($password)
     {
-        $this->password = $password;
+        $this->password = $this->obscure($password);
     
         return $this;
     }
@@ -226,5 +225,71 @@ class User implements AdvancedUserInterface, \Serializable
     public function getIsActive()
     {
         return $this->isActive;
+    }
+    /**
+     * 
+     * @param array $roles
+     */
+    public function setRoles($roles)
+    {
+    	$this->addRole($roles);
+    	
+    }
+    
+
+    /**
+     * Add roles
+     *
+     * @param $role
+     * @return User
+     */
+    public function addRole( $role)
+    {
+        
+        $this->roles[] = $role;
+        
+    }
+
+    /**
+     * Remove roles
+     *
+     * @param \HillCMS\UserBundle\Entity\Role $roles
+     */
+    public function removeRole(\HillCMS\UserBundle\Entity\Role $roles)
+    {
+        $this->roles->removeElement($roles);
+    }
+    /**
+     * Builds password
+     * @param unknown_type $password
+     * @param unknown_type $algorythm
+     * @return string
+     */
+    function obscure($password, $algorythm = "sha1")
+    {
+    	if ($this->salt == NULL)
+    	{
+    		$salt = hash($algorythm, uniqid(rand(), true));
+    	} else{
+    		$salt = $this->salt;
+    	}
+    	$hash_length = strlen($salt);
+    	$password_length = strlen($password);
+    	$password_max_length = $hash_length / 2;
+    	if ($password_length >= $password_max_length)
+    	{
+    		$salt = substr($salt, 0, $password_max_length);
+    	}
+    	else
+    	{
+    		$salt = substr($salt, 0, $password_length);
+    	}
+    	$salt_length = strlen($salt);
+    	$salted_password = hash($algorythm, $salt . $password);
+    	$used_chars = ($hash_length - $salt_length) * -1;
+    	$final_result = $salt . substr($salted_password, $used_chars);
+    	//update salt
+    	$this->salt = $salt;
+    	return $final_result;
     }
 }

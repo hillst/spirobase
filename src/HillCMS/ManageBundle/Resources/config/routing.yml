@@ -4,3 +4,12 @@ manage:
 save:
     pattern: /manage/save
     defaults: {_controller: HillCMSManageBundle:Default:save} 
+success:
+    pattern: /manage
+    defaults: {_controller:HillCMSManageBundle:Default:index}
+adduser:
+    pattern: /manage/adduser
+    defaults: {_controller:HillCMSManageBundle:Default:adduser}
+saverole:
+    pattern: /manage/saverole
+    defaults: {_controller: HillCMSManageBundle:Default:saverole}

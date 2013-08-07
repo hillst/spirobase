@@ -2,9 +2,13 @@
 
 namespace HillCMS\ManageBundle\Controller;
 
+use Symfony\Component\Debug\Exception\ContextErrorException;
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use HillCMS\ManageBundle\Entity\CmsPage;
 use HillCMS\ManageBundle\Entity\CmsPageThings;
+use HillCMS\UserBundle\Entity\User;
+use HillCMS\UserBundle\Entity\Role;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -47,11 +51,18 @@ class DefaultController extends Controller
 			//$page_arr["page_things"] = $srt_allowed_things; 
 			$allowed_pages[$i] = $page_arr;
 			$i++;
-		}    	
-		$fd = fopen("/scratch/pagesallowed", "w");
-		fwrite($fd, print_r($allowed_pages, TRUE));
-		fclose($fd);
-        return $this->render('HillCMSManageBundle:Default:index.html.twig',array('allowed_pages' => $allowed_pages));
+		}   
+		//permission to edit all users 	
+		if($this->get('security.context')->isGranted("ROLE_ADMIN") === TRUE){
+			$isAdmin = 1;
+			$repo = $em->getRepository("HillCMSUserBundle:User");	
+			$users = $repo->findAll();
+		} else{
+			$users[0] = $usr= $this->get('security.context')->getToken()->getUser();
+			$isAdmin = -1;
+		}
+	
+        return $this->render('HillCMSManageBundle:Default:index.html.twig',array('allowed_pages' => $allowed_pages, "users"=> $users, "isAdmin"=> $isAdmin));
     }
     /**
      * Action responsible for saving things to the database that are edited.
@@ -104,4 +115,57 @@ class DefaultController extends Controller
     	$em->flush();
     	return new Response($value);
     }
+    /*ERROR POSTING IDGI..... thats okay also gotta figure out why it thinks i'm not an admin ???????? */
+    function addUserAction()
+    {
+    	$request = $this->getRequest();
+    	$data = $request->request->all();
+    	if ($request->getMethod() === 'POST') {
+    		$username = $request->request->get('username', NULL);
+    		$password = $request->request->get('password', NULL);
+    		$email = $request->request->get('email', NULL);
+    		$role = $request->request->get('role', NULL);
+    		if ($username === NULL || $password === NULL || $email === NULL || $role === NULL){
+    			$value = "ERROR";
+    		}
+    	} else{
+    		return new Response("", 403);
+    	}
+    	//lookup the edited thing.
+    	$em = $this->getDoctrine()->getManager();
+    	$rolerepo = $em->getRepository("HillCMSUserBundle:Role");
+    	$roleobj = $rolerepo->findBy(array("role" => $role));
+    	if (sizeof($roleobj) <= 0){
+    		return new Response("Error", 404);
+    	}
+    	$roleobj = $roleobj[0];
+    	//check permissions
+    	$em = $this->getDoctrine()->getManager();	   	 
+    	if ($this->get('security.context')->isGranted("ROLE_ADMIN") === FALSE){
+    		//yikes! probably log
+    		return new Response("Not permitted", 403);
+    	}
+    	$user = new User();
+    	$user->setPassword($password);
+    	$user->setEmail($email);
+    	$user->setUsername($username);
+    	$value = "Successfully added ". $username;
+    	$em->persist($user);
+    	$em->flush();
+    	return new Response($value);
+    }
+    
+    function saveRoleAction()
+    {
+    	$em = $this->getDoctrine()->getEntityManager();
+    	$repo = $em->getRepository("HillCMSUserBundle:User");
+    	$user = $repo->findBy(array("id" => $this->getRequest()->get('id')));
+    	$user[0]->addRole($this->getRequest()->get('role'));
+    	$em->persist($user[0]);
+    	$em->flush();
+    	return new Response(":)");
+    	
+    }
+    
+    
 }

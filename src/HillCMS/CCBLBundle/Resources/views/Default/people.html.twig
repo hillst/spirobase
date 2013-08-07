@@ -1,0 +1,19 @@
+{% extends "HillCMSCCBLBundle:Default:bootstrap-template.html.twig" %}
+
+{% block body %}
+
+<div class="container-fluid marketing">
+	<div class="nav-size" style="width: 100%"></div>
+	{% for bio in bios %}
+		<div class="featurette"
+			style="padding-left: 20px; padding-right: 20px;">
+			<h2 class="featurette-heading">
+				{{ bio['Name'] }}<small> {{ bio['Title'] }}</small>
+			</h2>
+			<img src={{ asset(bio['Picture']) }} class='img-circle people span3'
+				style="float: left">
+			<div class=" span6"> {{ bio['Text'] }}</div>
+		</div>
+	{% endfor %}
+
+{% endblock %}

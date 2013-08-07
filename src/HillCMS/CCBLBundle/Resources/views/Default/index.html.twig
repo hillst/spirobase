@@ -3,39 +3,18 @@
 {% block body %}
 <div id="myCarousel1" class="carousel slide">
 	<div class="carousel-inner">
-		<div class="item">
-			<img src={{ asset("includes/images/servers1.jpg") }} alt="">
+		{% set active = 1 %}
+		{% for group in slides %}
+		<div class="item {% if  active == 1 %} active {% endif %}">
+			{% set active = 0 %}
+			<img src={{ asset(group['Image']) }} alt="">
 			<div class="container-fluid">
 				<div class="carousel-caption">
-					<h1>CCPL Server room.</h1>
+					<h1>{{group['Caption']}}</h1>
 				</div>
 			</div>
 		</div>
-		<div class="item">
-			<img src={{ asset("includes/images/Doug1.jpg") }} alt="">
-			<div class="container-fluid">
-				<div class="carousel-caption">
-					<h1>Use of growth chambers.</h1>
-				</div>
-			</div>
-		</div>
-		<div class="item">
-			<img src={{ asset("includes/images/phenotyper1.jpg") }} alt="">
-			<div class="container-fluid">
-				<div class="carousel-caption">
-					<h1>Lemnatec automated phenotyper.</h1>
-				</div>
-			</div>
-		</div>
-		<div class="item active">
-			<img src={{ asset("includes/images/phenotyper3.jpg") }} alt="">
-			<div class="container-fluid">
-				<div class="carousel-caption">
-					<h1>Lemnatec Phenotyper in use.</h1>
-					<!-- use class lead for the smaller subtext -->
-				</div>
-			</div>
-		</div>
+		{% endfor %}
 	</div>
 	<a class="left carousel-control" href="#myCarousel1" data-slide="prev">&lsaquo;</a>
 	<a class="right carousel-control" href="#myCarousel1" data-slide="next">&rsaquo;</a>
@@ -49,25 +28,11 @@ the content. -->
 class="container-fluid marketing">
 	<div class="featurette"
 	style="padding-left: 40px; padding-right: 40px;">
-		<h2 class="featurette-heading">The Crop Computational Biology
-		Labratory.</h2>
-
-		The Crop Computational Biology Laboratory (CCBL) at the Donald
-		Danforth Plant Science Center is composed of computational biologists,
-		bioinformaticists, and computer scientists, and is built upon the
-		resources provided by the Bioinformatics Core Facility.
+		<h2 class="featurette-heading">{{ main['Header'] }}</h2>
+			{{ main['Subheader'] }}
 		<br/>
 		<p>
-			Members of the CCBL work on large numbers of diverse projects
-			spanning high-throughput sequencing data analysis, genome assembly
-			and analysis, transcriptome assembly and analysis, structural and
-			functional annotation, differential expression analysis, comparative
-			genomics and transcriptomics, marker discovery, and many other areas
-			of research. Areas of particular interest include development of
-			algorithms and techniques for analysis of high-throughput plant
-			phenotyping data and development of algorithms and techniques for
-			integrating genotype, phenotype, and environmental data to better
-			understand and predict plant stress responses.
+			{{ main['Block'] }}
 		</p>
 	</div>
 </div>

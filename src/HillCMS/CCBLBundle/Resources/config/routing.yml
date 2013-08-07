@@ -8,3 +8,6 @@ login_check:
     pattern:   /login_check
 logout:
     pattern: /logout
+people:
+    pattern: /people
+    defaults: { _controller: HillCMSCCBLBundle:People:index }

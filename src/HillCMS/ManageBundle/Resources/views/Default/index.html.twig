@@ -5,15 +5,16 @@
 			<li {% if first == 0 %}class="active"{% endif %}><a href="#{{ pages["page"].Name }}" data-toggle="tab">{{ pages["page"].Name  }}</a></li>
 			{% set first = first + 1 %}
 		{% endfor %}
+		<li><a href="#users" data-toggle="tab">User Management</a></li>
 	{% endblock %}
 	{% block pagethings %}
 		{% set first = 0 %}
 		{% for pages in allowed_pages %}
 			<div class="tab-pane {% if first == 0 %}active{% endif %}" id="{{ pages["page"].Name }}">
             	{% for groups in pages["page_things"] %}
-            		<h2>Group</h2>
+            		<h2>{{ (groups[0].Thingname|split('-'))[0] }}</h2>
             		{% for things in groups %}
-	            		<h4>{{ things.Thingname }}</h3>
+	            		<h4>{{(things.Thingname|split('-'))[1] }}</h4>
 	            		<p>
 	            			<div class='editable' id= "{{ things.Thingid }}">{{ things.Content }} </div>
 	            		</p>
@@ -33,6 +34,8 @@
          cancel    : 'Cancel',
          submit    : 'OK' 
      });
+    
+         
  });
 </script>
 {% endblock %}

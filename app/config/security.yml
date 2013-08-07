@@ -27,6 +27,8 @@ security:
         #- { path: ^/manage, roles: ROLE_ADMIN, requires_channel: https}
         - { path: ^/manage, roles: [ROLE_ADMIN, ROLE_USER] }
         - { path: ^/manage/save, roles: [ROLE_ADMIN, ROLE_USER]}
+        - { path: ^/manage/adduser, roles: [ROLE_ADMIN]}
+        - { path: ^/manage/saverole, roles: [ROLE_ADMIN]}
         #- { path: ^/cart/checkout, roles: ADMIN, EDITOR, MANAGER, requires_channel: https }
             
             
