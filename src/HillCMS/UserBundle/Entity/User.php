@@ -1,127 +1,86 @@
 <?php
+
 namespace HillCMS\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\User\AdvancedUserInterface;
-use Doctrine\Common\Collections\ArrayCollection;
+
 
 /**
- * HillCMS\UserBundle\Entity\User
+ * User
  *
- * @ORM\Table(name="users")
+ * @ORM\Table(name="user")
  * @ORM\Entity(repositoryClass="HillCMS\UserBundle\Entity\UserRepository")
  */
-
-
-class User implements AdvancedUserInterface, \Serializable
+class User implements UserInterface, \Serializable
 {
-	/**
-	 * @ORM\Column(type="integer")
-	 * @ORM\Id
-	 * @ORM\GeneratedValue(strategy="AUTO")
-	 */
-	private $id;
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="id", type="integer", nullable=false)
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    private $id;
 
-	/**
-	 * @ORM\Column(type="string", length=25, unique=true)
-	 */
-	private $username;
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="username", type="string", length=25, nullable=false)
+     */
+    private $username;
 
-	/**
-	 * @ORM\Column(type="string", length=32)
-	 */
-	private $salt;
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="salt", type="string", length=32, nullable=false)
+     */
+    private $salt;
 
-	/**
-	 * @ORM\Column(type="string", length=40)
-	 */
-	private $password;
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="password", type="string", length=40, nullable=false)
+     */
+    private $password;
 
-	/**
-	 * @ORM\Column(type="string", length=60, unique=true)
-	 */
-	private $email;
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="email", type="string", length=60, nullable=false)
+     */
+    private $email;
 
-	/**
-	 * @ORM\Column(name="is_active", type="boolean")
-	 */
-	private $isActive;
-	/**
-	 * @ORM\ManyToMany(targetEntity="Role", inversedBy="users")
-	 */
-	private $roles;
-	
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="is_active", type="boolean", nullable=false)
+     */
+    private $isActive;
 
-	public function __construct()
-	{
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="role", type="string", length=11, nullable=false)
+     */
+    private $role;
+
+
+	public function __construct(){
 		$this->isActive = true;
 		$this->salt = sha1(uniqid(null, true));
-	}	
-	
-	public function getRoles()
-	{
-		return $this->roles->toArray();
 	}
 	
-	
-	public function isAccountNonExpired(){
-		return TRUE;
+	public function eraseCredentials(){
+		
 	}
-	
-	public function isAccountNonLocked(){
-		return TRUE;
-	}
-	
-	public function isCredentialsNonExpired(){
-		return TRUE;
-	}
-	
-	public function isEnabled(){
-		return $this->isActive;
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	public function getUsername()
-	{
-		return $this->username;
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	public function getSalt()
-	{
-		return $this->salt;
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	public function getPassword()
-	{
-		return $this->password;
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	public function eraseCredentials()
-	{
-	}
-
-	/**
-	 * @see \Serializable::serialize()
-	 */
 	public function serialize()
 	{
 		return serialize(array(
 				$this->id,
 		));
 	}
-
+	
 	/**
 	 * @see \Serializable::unserialize()
 	 */
@@ -131,7 +90,8 @@ class User implements AdvancedUserInterface, \Serializable
 				$this->id,
 		) = unserialize($serialized);
 	}
-
+	
+	
     /**
      * Get id
      *
@@ -156,6 +116,16 @@ class User implements AdvancedUserInterface, \Serializable
     }
 
     /**
+     * Get username
+     *
+     * @return string 
+     */
+    public function getUsername()
+    {
+        return $this->username;
+    }
+
+    /**
      * Set salt
      *
      * @param string $salt
@@ -169,6 +139,16 @@ class User implements AdvancedUserInterface, \Serializable
     }
 
     /**
+     * Get salt
+     *
+     * @return string 
+     */
+    public function getSalt()
+    {
+        return $this->salt;
+    }
+
+    /**
      * Set password
      *
      * @param string $password
@@ -176,9 +156,21 @@ class User implements AdvancedUserInterface, \Serializable
      */
     public function setPassword($password)
     {
-        $this->password = $this->obscure($password);
-    
+    	$factory = $this->get('security.encoder_factory');    	
+    	$encoder = $factory->getEncoder($this);
+    	$password = $encoder->encodePassword($password, $user->getSalt());
+    	$this->password = $password;    
         return $this;
+    }
+
+    /**
+     * Get password
+     *
+     * @return string 
+     */
+    public function getPassword()
+    {
+        return $this->password;
     }
 
     /**
@@ -226,70 +218,31 @@ class User implements AdvancedUserInterface, \Serializable
     {
         return $this->isActive;
     }
-    /**
-     * 
-     * @param array $roles
-     */
-    public function setRoles($roles)
-    {
-    	$this->addRole($roles);
-    	
-    }
-    
 
     /**
-     * Add roles
+     * Set role
      *
-     * @param $role
+     * @param string $role
      * @return User
      */
-    public function addRole( $role)
+    public function setRole($role)
     {
-        
-        $this->roles[] = $role;
-        
+        $this->role = $role;
+    
+        return $this;
     }
 
     /**
-     * Remove roles
+     * Get role
      *
-     * @param \HillCMS\UserBundle\Entity\Role $roles
+     * @return string 
      */
-    public function removeRole(\HillCMS\UserBundle\Entity\Role $roles)
+    public function getRole()
     {
-        $this->roles->removeElement($roles);
+        return $this->role;
     }
-    /**
-     * Builds password
-     * @param unknown_type $password
-     * @param unknown_type $algorythm
-     * @return string
-     */
-    function obscure($password, $algorythm = "sha1")
-    {
-    	if ($this->salt == NULL)
-    	{
-    		$salt = hash($algorythm, uniqid(rand(), true));
-    	} else{
-    		$salt = $this->salt;
-    	}
-    	$hash_length = strlen($salt);
-    	$password_length = strlen($password);
-    	$password_max_length = $hash_length / 2;
-    	if ($password_length >= $password_max_length)
-    	{
-    		$salt = substr($salt, 0, $password_max_length);
-    	}
-    	else
-    	{
-    		$salt = substr($salt, 0, $password_length);
-    	}
-    	$salt_length = strlen($salt);
-    	$salted_password = hash($algorythm, $salt . $password);
-    	$used_chars = ($hash_length - $salt_length) * -1;
-    	$final_result = $salt . substr($salted_password, $used_chars);
-    	//update salt
-    	$this->salt = $salt;
-    	return $final_result;
+    
+    public function getRoles(){
+    	return array($this->role);
     }
 }
