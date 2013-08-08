@@ -144,12 +144,10 @@ class DefaultController extends Controller
     	if ($this->get('security.context')->isGranted($perm) === FALSE){
     		return new Response("Not permitted", 403);
     	}
-    	$fd = fopen("/scratch/postdata", "w");
-    	fwrite($fd, print_r($request->request->all(), TRUE));
-    	fclose($fd);
-    	
     	$thingsrepo = $em->getRepository("HillCMSManageBundle:CmsPageThings");
-    	$maxgroup = $thingsrepo->findBy(array("groupnum" => "ASC"));
+    	$maxgroup = $thingsrepo->findBy(array(), array("groupnum" => "DESC"));
+    	
+    	
     	$maxgroup = $maxgroup[0]->getGroupnum();
     	$maxgroup += 1;
     	
