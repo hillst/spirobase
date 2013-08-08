@@ -13,3 +13,6 @@ adduser:
 saverole:
     pattern: /manage/saverole
     defaults: {_controller: HillCMSManageBundle:Default:saverole}
+addthing:
+    pattern: /manage/addthing
+    defaults: {_controller:HillCMSManageBundle:Default:addthing}

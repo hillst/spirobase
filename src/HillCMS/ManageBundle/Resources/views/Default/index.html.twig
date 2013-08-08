@@ -20,6 +20,17 @@
 	            		</p>
 	            	{% endfor %}
             	{% endfor %}
+            	{#At the end you want to add our form, some of these shouldn't be enabled somehow, maybe manually.#}
+            	{% for key, group in pages["supergroups"] %}
+            		<h2>Add new {{ key }}</h2>
+            	    <form id ="form" action='{{ path('addthing') }}' method="POST">
+            		{% for field in group %}
+            			<input type="text" name="{{key}}-{{ field }}" placeholder="{{ field }}"></input><br/>
+            		{% endfor %}
+            		<input type="hidden" value="{{ pages["page"].Pid }}" name="pageid"/>
+            		<input type="submit"></input>
+            		</form>
+            	{% endfor %}
         	</div>
         	{% set first = first + 1 %}
         {% endfor %}

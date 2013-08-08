@@ -42,10 +42,10 @@ class CMSController extends Controller
 			if (! key_exists($exploded_group[0], $things)){
 				$things[$exploded_group[0]] = array();
 			}
-			if (! key_exists($group->getGroup(), $things[$exploded_group[0]])){
-				$things[$exploded_group[0]][$group->getGroup()] = array();
+			if (! key_exists($group->getGroupnum(), $things[$exploded_group[0]])){
+				$things[$exploded_group[0]][$group->getGroupnum()] = array();
 			}
-			$things[$exploded_group[0]][$group->getGroup()][$exploded_group[1]] = $group->getContent();
+			$things[$exploded_group[0]][$group->getGroupnum()][$exploded_group[1]] = $group->getContent();
 		}
 		return $things;
 	}

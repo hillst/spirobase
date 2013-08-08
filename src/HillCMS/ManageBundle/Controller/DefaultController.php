@@ -43,16 +43,17 @@ class DefaultController extends Controller
 			$page_arr["page"] = $page;
 			$page_arr["page_things"] = array();
 			foreach ($srt_allowed_things as $thinggroups){
-				if (! key_exists($thinggroups->getGroup(), $page_arr["page_things"])){
-					$page_arr["page_things"][$thinggroups->getGroup()] = array();
+				if (! key_exists($thinggroups->getGroupnum(), $page_arr["page_things"])){
+					$page_arr["page_things"][$thinggroups->getGroupnum()] = array();
 				} 
-				array_push($page_arr["page_things"][$thinggroups->getGroup()], $thinggroups);
+				array_push($page_arr["page_things"][$thinggroups->getGroupnum()], $thinggroups);
 			}
-			//$page_arr["page_things"] = $srt_allowed_things; 
+			$page_arr["supergroups"] = $this->createAddNewThingForm($page_arr["page_things"]);
+			//permission to edit all users
 			$allowed_pages[$i] = $page_arr;
 			$i++;
+			//create add new thing forms, append to end of allowed_things
 		}   
-		//permission to edit all users 	
 		if($this->get('security.context')->isGranted("ROLE_ADMIN") === TRUE){
 			$isAdmin = 1;
 			$repo = $em->getRepository("HillCMSUserBundle:User");	
@@ -61,7 +62,6 @@ class DefaultController extends Controller
 			$users[0] = $usr= $this->get('security.context')->getToken()->getUser();
 			$isAdmin = -1;
 		}
-	
         return $this->render('HillCMSManageBundle:Default:index.html.twig',array('allowed_pages' => $allowed_pages, "users"=> $users, "isAdmin"=> $isAdmin));
     }
     /**
@@ -118,41 +118,63 @@ class DefaultController extends Controller
     /*ERROR POSTING IDGI..... thats okay also gotta figure out why it thinks i'm not an admin ???????? */
     function addUserAction()
     {
+    	return new Response("invalid action");
+    }
+    
+    function addThingAction(){
+    	/*
+    	 * Get POST data
+    	 * make sure user can edit this page (from form)
+    	 * create thing objects
+    	 * submit thing objects to database
+    	 * redirect
+    	 */
     	$request = $this->getRequest();
-    	$data = $request->request->all();
-    	if ($request->getMethod() === 'POST') {
-    		$username = $request->request->get('username', NULL);
-    		$password = $request->request->get('password', NULL);
-    		$email = $request->request->get('email', NULL);
-    		$role = $request->request->get('role', NULL);
-    		if ($username === NULL || $password === NULL || $email === NULL || $role === NULL){
-    			$value = "ERROR";
-    		}
-    	} else{
-    		return new Response("", 403);
-    	}
-    	//lookup the edited thing.
-    	$em = $this->getDoctrine()->getManager();
-    	$rolerepo = $em->getRepository("HillCMSUserBundle:Role");
-    	$roleobj = $rolerepo->findBy(array("role" => $role));
-    	if (sizeof($roleobj) <= 0){
-    		return new Response("Error", 404);
-    	}
-    	$roleobj = $roleobj[0];
-    	//check permissions
-    	$em = $this->getDoctrine()->getManager();	   	 
-    	if ($this->get('security.context')->isGranted("ROLE_ADMIN") === FALSE){
-    		//yikes! probably log
+    	if ($request->getMethod() != 'POST'){
     		return new Response("Not permitted", 403);
     	}
-    	$user = new User();
-    	$user->setPassword($password);
-    	$user->setEmail($email);
-    	$user->setUsername($username);
-    	$value = "Successfully added ". $username;
-    	$em->persist($user);
-    	$em->flush();
-    	return new Response($value);
+    	$perm = 0;//some value from the form
+    	$pageid = $request->request->get('pageid');
+    	//do lookup
+    	$em = $this->getDoctrine()->getManager();
+    	$repo = $em->getRepository("HillCMSManageBundle:CmsPage");
+    	$page = $repo->findBy(array("pid"=>$pageid));
+    	$page = $page[0]; //should work or error w/e
+    	$perm = $page->getRoleAllowed();
+    	if ($this->get('security.context')->isGranted($perm) === FALSE){
+    		return new Response("Not permitted", 403);
+    	}
+    	$fd = fopen("/scratch/postdata", "w");
+    	fwrite($fd, print_r($request->request->all(), TRUE));
+    	fclose($fd);
+    	
+    	$thingsrepo = $em->getRepository("HillCMSManageBundle:CmsPageThings");
+    	$maxgroup = $thingsrepo->findBy(array("groupnum" => "ASC"));
+    	$maxgroup = $maxgroup[0]->getGroupnum();
+    	$maxgroup += 1;
+    	
+    	$pagerepo = $em->getRepository("HillCMSManageBundle:CmsPage");
+    	$page = $pagerepo->findBy(array("pid"=>$pageid));
+    	if (sizeof($page) < 1){
+    		
+    	} else{
+    		$pageid = $page[0]; 
+    	}
+    	foreach($request->request->all() as $key => $superfield){
+    		if($key !== "pageid"){
+    			$thing = new CmsPageThings();
+    			$thing->setGroupnum($maxgroup);
+    			$thing->setThingname($key);
+    			$thing->setContent($superfield);
+    			$thing->setPageid($pageid);
+    			$em->persist($thing);
+    			$em->flush();
+    		}
+    	}
+    	
+    	
+    	return $this->redirect($this->get('router')->generate('manage'));
+    	
     }
     
     function saveRoleAction()
@@ -164,6 +186,61 @@ class DefaultController extends Controller
     	$em->persist($user[0]);
     	$em->flush();
     	return new Response(":)");
+    	
+    }
+    /**
+     * Takes list of things, goes through each group, finds the supergroups, and creates a form to add a new element in that supergroup.
+     * returns list of forms.
+     * 
+     * Expects an input that is an array where the key is the group number, and the values are the page_things that have that group number
+     * 
+     * [2] (group number) => array
+                        (
+                            [0] => HillCMS\ManageBundle\Entity\CmsPageThings Object
+                                (
+                                    [content:HillCMS\ManageBundle\Entity\CmsPageThings:private] => some text
+                                    [thingname:HillCMS\ManageBundle\Entity\CmsPageThings:private] => Bio-Name
+                                    [group:HillCMS\ManageBundle\Entity\CmsPageThings:private] => 2
+                                    [thingid:HillCMS\ManageBundle\Entity\CmsPageThings:private] => 7
+                                    [pageid:HillCMS\ManageBundle\Entity\CmsPageThings:private] => HillCMS\Manage
+                                    ....
+     * 
+     * For a page that has Main-Body, Leader-Image, Leader-Name, Leader-Title, the output will look as follows:
+     * 
+     * Array
+	 *	(
+			    [Leader] => Array
+			        (
+			            [0] => Image
+			            [1] => Name
+			            [2] => Title
+			        )
+			
+			    [Main] => Array
+			        (
+			            [0] => Body
+			        )
+			
+			)
+     * 
+     * @param array $thing_array
+     */
+    function createAddNewThingForm($thing_array)
+    {
+    	$supergroups = array(); //"supername-subname for field name"
+    	foreach($thing_array as $group){
+    		//each group has thing
+    		foreach($group as $groupthings){
+    			$name_split = explode("-", $groupthings->getThingname());
+    			if( !array_key_exists($name_split[0], $supergroups)){
+    				$supergroups[$name_split[0]] = array();
+    			}
+    			if (array_search($name_split[1], $supergroups[$name_split[0]]) === FALSE){
+    				array_push($supergroups[$name_split[0]],$name_split[1]);
+    			}
+    		}	
+    	}
+    	return $supergroups;
     	
     }
     

@@ -13,6 +13,15 @@ use Doctrine\ORM\Mapping as ORM;
 class CmsPageThings
 {
     /**
+     * @var integer
+     *
+     * @ORM\Column(name="thingid", type="integer", nullable=false)
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    private $thingid;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="content", type="text", nullable=false)
@@ -29,23 +38,14 @@ class CmsPageThings
     /**
      * @var integer
      *
-     * @ORM\Column(name="group", type="integer", nullable=false)
+     * @ORM\Column(name="groupnum", type="integer", nullable=false)
      */
-    private $group;
+    private $groupnum;
 
     /**
-     * @var integer
+     * @var \CmsPage
      *
-     * @ORM\Column(name="thingid", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $thingid;
-
-    /**
-     * @var \HillCMS\ManageBundle\Entity\CmsPage
-     *
-     * @ORM\ManyToOne(targetEntity="HillCMS\ManageBundle\Entity\CmsPage")
+     * @ORM\ManyToOne(targetEntity="CmsPage")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="pageid", referencedColumnName="pid")
      * })

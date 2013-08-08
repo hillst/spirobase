@@ -6,7 +6,7 @@
     </id>
     <field name="content" type="text" column="content" nullable="false"/>
     <field name="thingname" type="string" column="thingname" length="25" nullable="false"/>
-    <field name="group" type="integer" column="group" nullable="false"/>
+    <field name="groupnum" type="integer" column="groupnum" nullable="false"/>
     <many-to-one field="pageid" target-entity="CmsPage">
       <join-columns>
         <join-column name="pageid" referenced-column-name="pid"/>
