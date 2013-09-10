@@ -59,7 +59,7 @@ class DefaultController extends Controller
 			$repo = $em->getRepository("HillCMSUserBundle:User");	
 			$users = $repo->findAll();
 		} else{
-			$users[0] = $usr= $this->get('security.context')->getToken()->getUser();
+			$users[0] = $this->get('security.context')->getToken()->getUser();
 			$isAdmin = -1;
 		}
         return $this->render('HillCMSManageBundle:Default:index.html.twig',array('allowed_pages' => $allowed_pages, "users"=> $users, "isAdmin"=> $isAdmin));
@@ -115,10 +115,37 @@ class DefaultController extends Controller
     	$em->flush();
     	return new Response($value);
     }
-    /*ERROR POSTING IDGI..... thats okay also gotta figure out why it thinks i'm not an admin ???????? */
+    
     function addUserAction()
     {
-    	return new Response("invalid action");
+    	$request = $this->getRequest();
+    	if ($request->getMethod() != "POST"){
+    		return new Response("Not permitted", 403);
+    	}
+    	//not allowed!
+    	if (!$this->get('security.context')->isGranted("ROLE_ADMIN")){
+    		return new Response("Not permitted", 403);	
+    	}
+    	//get fields
+    	$perm = 0;//some value from the form
+    	$username = $request->request->get('username');
+    	$password = $request->request->get('password');
+    	$role = $request->request->get('role');
+    	if ($username == "" || $password == "" || $role == ""){
+    		return new Response("Bad form submission", 400);
+    	}
+    	$newuser = new User($username, $password, $role);
+    	$factory = $this->get('security.encoder_factory');
+    	$encoder = $factory->getEncoder($newuser);
+    	$password = $encoder->encodePassword($password, $newuser->getSalt());
+    	$newuser->setPassword($password);
+    	$email = ""; //bad
+    	$newuser->setEmail($email);
+    	$em = $this->getDoctrine()->getEntityManager();
+    	$em->persist($newuser);
+    	$em->flush();
+    	
+    	return new Response("Successfully added user " . $username . " " . $role .". Reload your page to modify the user.");
     }
     
     function addThingAction(){
@@ -175,17 +202,6 @@ class DefaultController extends Controller
     	
     }
     
-    function saveRoleAction()
-    {
-    	$em = $this->getDoctrine()->getEntityManager();
-    	$repo = $em->getRepository("HillCMSUserBundle:User");
-    	$user = $repo->findBy(array("id" => $this->getRequest()->get('id')));
-    	$user[0]->addRole($this->getRequest()->get('role'));
-    	$em->persist($user[0]);
-    	$em->flush();
-    	return new Response(":)");
-    	
-    }
     /**
      * Takes list of things, goes through each group, finds the supergroups, and creates a form to add a new element in that supergroup.
      * returns list of forms.
@@ -240,6 +256,119 @@ class DefaultController extends Controller
     	}
     	return $supergroups;
     	
+    }
+    
+    function changePassAction()
+    {
+    	$request = $this->getRequest();
+    	$curuser = $this->get('security.context')->getToken()->getUser();
+    	
+    	//i dont remember the problem
+    	if ($request->getMethod() != "POST"){
+    		return new Response("Not permitted", 403);
+    	}
+    	//not allowed!
+    	$oldpass = $request->get('oldpass'); //could be blank
+    	$password = $request->get('password');
+    	$mpassword = $request->get('mpassword');
+    	$id = $request->get('id');
+    	
+    	//initial validation
+    	if (!($this->get('security.context')->isGranted("ROLE_ADMIN")) && $curuser->getId() != $id ){
+    		return new Response("Not permitted admin" . $curuser->getId() . " " . $id, 403);
+    	}
+    	
+    	if ($password == "" || $id == ""){
+    		return new Response("Bad form submission.", 400);
+    	}
+    	
+    	$em = $this->getDoctrine()->getEntityManager();
+    	$repo = $em->getRepository("HillCMSUserBundle:User");
+    	$user = $repo->findBy(array("id" => $id));
+    	$factory = $this->get('security.encoder_factory');
+    	$encoder = $factory->getEncoder($user[0]);
+    	
+    	if (sizeof($user) < 1){
+    		return new Response("Bad form submission.", 400);
+    	}
+    	
+    	if ($password != $mpassword){
+    		return new Response("Passwords do not match.", 400);
+    	}
+    	//normal user expect oldpass
+    	if(!$this->get('security.context')->isGranted("ROLE_ADMIN")){
+    		$hasoldpass = $encoder->encodePassword($oldpass, $user[0]->getSalt());
+    		if( $hasoldpass != $user[0]->getPassword()){
+    			return new Response("Invalid old password", 400 );
+    		}
+    	}
+    	
+    	$password = $encoder->encodePassword($password, $user[0]->getSalt());
+    	$user[0]->setPassword($password);
+    	$em->persist($user[0]);
+    	$em->flush();
+    	
+    	return new Response("Success changing password for ". $user[0]->getUsername(). ".");	
+    }
+    
+
+    function editUsernameAction()
+    {
+    	$request = $this->getRequest();
+    	$curuser = $this->get('security.context')->getToken()->getUser();
+    	
+    	if ($request->getMethod() != "POST"){
+    		return new Response("Not permitted", 403);
+    	}
+    	$id = $request->get('id');
+    	$username = $request->get('username');
+    	if ($id == "" || $username == ""){
+    		return new Response("Bad form submission.", 400);
+    	}
+    	//not allowed!
+    	if (!$this->get('security.context')->isGranted("ROLE_ADMIN")){
+    		return new Response("Not permitted", 403);
+    	}
+    	
+    	$em = $this->getDoctrine()->getEntityManager();
+    	$repo = $em->getRepository("HillCMSUserBundle:User");
+    	$user = $repo->findBy(array("id" => $id));
+    	 
+    	$user[0]->setUsername($username);
+    	$em->persist($user[0]);
+    	$em->flush();
+    	return new Response("Success! Username changed to ". $username . ".");
+    }
+    
+    function saveRoleAction()
+    {
+    	$request = $this->getRequest();
+    	$curuser = $this->get('security.context')->getToken()->getUser();
+    	
+    	if ($request->getMethod() != "POST"){
+    		return new Response("Not permitted", 403);
+    	}
+    	$id = $request->get('id');
+    	$role = $request->get('role');
+    	if ($id == "" || $role == ""){
+    		return new Response("Bad form submission.", 400);
+    	}
+    	//not allowed!
+    	if (!$this->get('security.context')->isGranted("ROLE_ADMIN")){
+    		return new Response("Not permitted", 403);
+    	}
+    	
+    	$em = $this->getDoctrine()->getEntityManager();
+    	$repo = $em->getRepository("HillCMSUserBundle:User");
+    	
+    		
+    	$user = $repo->findBy(array("id" => $id));
+    	
+    	$user[0]->setRole($role);
+    	$em->persist($user[0]);
+    	$em->flush();
+    	return new Response("Success! Role for " . $user[0]->getUsername() . " changed to ". $role . ".");
+    	 
     }
     
     

@@ -34,9 +34,125 @@
         	</div>
         	{% set first = first + 1 %}
         {% endfor %}
+        {#assert user is admin#}
+        <div class="tab-pane" id="users">
+	        <a id="status"></a>
+	        <div id ="alert-box" class="alert hidden" style="margin-top:2%">
+	          <button type="button" class="close" data-dismiss="alert">&times;</button> 
+	        </div>
+        {% if isAdmin == 1 %}
+        	{% for user in users %}
+        		<h2>{{ user.username }}</h2>
+        		<form class = "form-group form-horizontal editusername" role="form" action="{{ path("editusername") }}" method="POST">
+					Username	    
+				    <div>
+				      <input type="text" class="form-control" name="username" value="{{ user.username }}">
+				      <input type="hidden" value="{{ user.id }}" name="id"></input>
+				      <button type="submit" class="btn btn-default">Change username</button>
+				    </div>
+				</form>
+				   
+				<form class="form-group form-horizontal changepass" role="form" action="{{ path("changepass") }}" method="POST">
+					New Password
+				    <div>
+				      <input type="password" class="form-control" name="password" placeholder="Password"><br/>
+				    Repeat Password <br/>
+				      <input type="password" class="form-control" name="mpassword" placeholder="Repeat Password">
+				      <input type="hidden" value="{{ user.id }}" name="id"></input>
+				      <button type="submit" class="btn btn-default">Change password</button>
+				    </div>
+				</form>
+				   
+				<form class="form-group form-horizontal saverole" role="form" action="{{ path("saverole") }}" method="POST">
+					Role
+					<div>
+				    	<select class="form-control" name="role">
+				      		<option value="ROLE_ADMIN" {% if user.role == "ROLE_ADMIN" %}selected{% endif %}>ROLE_ADMIN</option>
+				      		<option value="ROLE_USER" {% if user.role == "ROLE_USER" %}selected{% endif %}>ROLE_USER</option>
+				      	</select>
+				      	<input type="hidden" value="{{ user.id }}" name="id"></input>
+				      	<button type="submit" class="btn btn-default">Change Role</button>
+				    </div>
+				</form>
+        	{% endfor %}
+        	<h2>New User</h2>
+        	<form class="form-group form-horizontal adduser" role="form" action="{{ path("adduser") }}" method="POST">
+        		Username<br/>
+        		<input type="text" class="form-control" name="username" placeholder="username"></input><br/><br/>
+        		Password<br/>
+        		<input type="password" class="form-control" name="password" placeholder="password"></input><br/><br/>
+        		Role<br/>
+        		<select class="form-control" name="role">
+        			<option value="ROLE_ADMIN" >ROLE_ADMIN</option>
+        			<option value="ROLE_USER" selected>ROLE_USER</option>
+        		</select>
+        		<br/>
+        		<button type="submit" class="btn btn-default">Add User</button>
+        	</form>
+
+        {% endif %}
+        {% if isAdmin == -1 %}
+        {% set user = users[0] %}
+        
+        	<h2>{{ user.username }} - Change Password</h2>
+        		
+				   
+				<form class="form-group form-horizontal changepass" role="form" action="{{ path("changepass") }}" method="POST">
+						Old password<br/>
+				    	<input type="password" class="form-control" name="oldpass" placeholder="Old Password"></input> <br/>
+				    	New password <br/>
+					    <input type="password" class="form-control" name="password" placeholder="Password"></input> <br/>
+					    Repeat new password <br/>
+					    <input type="password" class="form-control" name="mpassword" placeholder="Repeat Password"></input>
+					    <input type="hidden" value="{{ user.id }}" name="id"></input>
+					    <button type="submit" class="btn btn-default">Change password</button>
+				    
+				</form>
+        {% endif %}
+        </div>
 	{% endblock %}
 {% block javascript %}
 <script type="text/javascript">
+var request;
+
+function ajaxWithAlert(event, path, form){
+    if (request) {
+        request.abort();
+    }
+    var $form = form;
+    var closer =  '<button type="button" class="close" data-dismiss="alert">&times;</button>';
+    
+    var $inputs = $form.find("input, select, button, textarea");
+    var serializedData = $form.serialize();
+    $inputs.prop("disabled", true);
+    request = $.ajax({
+        url: path,
+        type: "post",
+        data: serializedData
+    });
+    request.done(function (response, textStatus, jqXHR){
+		//set status, goto anchor
+        location.hash = "#status";
+        $("#alert-box").removeClass("alert-error hidden");
+        $("#alert-box").addClass("alert-success");
+        $("#alert-box").html(closer + response)
+	    
+    });
+	request.fail(function (jqXHR, textStatus, errorThrown){
+		//set status, goto anchor
+        $("#alert-box").removeClass("alert-success hidden");
+        $("#alert-box").addClass("alert-error");
+        $("#alert-box").html(closer + jqXHR.responseText);
+    });
+    request.always(function () {
+    	$(document.body).animate({
+    	    'scrollTop':   $('#status').offset().top
+    	}, 300);
+        $inputs.prop("disabled", false);
+    });
+	event.preventDefault();
+};
+
 	$(document).ready(function() {
      $('.editable').editable('{{ path('save')}}', {
          indicator : 'Saving...',
@@ -45,7 +161,25 @@
          cancel    : 'Cancel',
          submit    : 'OK' 
      });
-    
+	//bind for each edit option
+	$(".changepass").submit(function(event){
+		ajaxWithAlert(event, '{{ path("changepass") }}', $(this) ) 
+	}); //wat
+
+	{% if isAdmin == 1 %}
+		// admin specific javascript (Add user, edit role, edit username)	
+		$(".adduser").submit(function(event){
+			ajaxWithAlert(event, '{{ path("adduser") }}', $(this) ) 
+		}); 
+		$(".saverole").submit(function(event){
+			ajaxWithAlert(event, '{{ path("saverole") }}', $(this) ) 
+		}); 
+		$(".editusername").submit(function(event){
+			ajaxWithAlert(event, '{{ path("editusername") }}', $(this) ) 
+		}); 
+	{% endif %}
+	
+	
          
  });
 </script>

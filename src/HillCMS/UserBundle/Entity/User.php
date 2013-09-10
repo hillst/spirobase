@@ -1,5 +1,4 @@
 <?php
-
 namespace HillCMS\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -65,10 +64,19 @@ class User implements UserInterface, \Serializable
      */
     private $role;
 
-
-	public function __construct(){
+	/**
+	 * Be sure to call set password after initial construct!!!
+	 * @param unknown_type $username
+	 * @param unknown_type $password
+	 * @param unknown_type $salt
+	 * @param unknown_type $role
+	 */
+	public function __construct($username, $password, $role){
 		$this->isActive = true;
 		$this->salt = sha1(uniqid(null, true));
+		$this->username = $username;
+		$this->password = $password;
+		$this->role = $role;
 	}
 	
 	public function eraseCredentials(){
@@ -149,16 +157,13 @@ class User implements UserInterface, \Serializable
     }
 
     /**
-     * Set password
+     * Set password, THIS PASSWORD IS NOT HASHED. call the encoder method encodePassword before setting the final password.
      *
      * @param string $password
      * @return User
      */
     public function setPassword($password)
     {
-    	$factory = $this->get('security.encoder_factory');    	
-    	$encoder = $factory->getEncoder($this);
-    	$password = $encoder->encodePassword($password, $user->getSalt());
     	$this->password = $password;    
         return $this;
     }

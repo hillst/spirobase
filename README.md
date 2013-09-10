@@ -24,20 +24,15 @@ By using these types, a developer can build a page using Things and Pages. If th
 
 The server will automatically update the database and push it live. In future versions there may be a waiting feature where they are pushed to a non-published state (similar to drupal and wordpress).
 
+If you want to upload files to the server, this should be done manually. All files belong in web/includes. They can be accessed from twig using the asset command.
+
 #Important Notes#
 parameters.yml is not included or configured. This file is in the app/config directory and is required for connection to the database.
-Be sure to use seed.sql to seed your database, it contains two default users, admin and user. Both user's passwords are password. Neither have an associated salt.
+
+Be sure to use base.sql to seed your database, it contains two default users, admin and user. Both user's passwords are password. Neither have an associated salt.
 
 #Adding Users and Security Notes#
-Currently the only way to do this is to manually edit the database. I may add a file outside of the framework for doing this, as Symfony does not allow for properly adding users with an attached role. To properly salt and encode the password, do the following:
 
-$factory = $this->get('security.encoder_factory');
-$user = new User();
-$encoder = $factory->getEncoder($user);
-$password = $encoder->encodePassword('ryanpass', $user->getSalt());
-$user->setPassword($password);
+The site should also be configured to use https for the manage page and login pages. In app/config/security.yml there is a setting that is commented out requiring for https. Additionally apache may need to be configured.
 
-The basic configuration, as set in app/config/security.yml uses sha1 encoding, for entering passwords manually be sure to use this.
-
-Additionally, in that same file, be sure to enable https for the secured area.
-
+By adding users from the manage page on the admin account, you can easily create new admins. As of now there is no way to remove users without manually editing the database.
