@@ -29,6 +29,22 @@ body {
 input {
 	height:30px;
 }
+
+.btn-delete{
+	background:#FFFFFF;
+	border:#FFFFFF;
+	color: #035D2D;
+	text-decoration: underline;
+	font-size: 31.5px;
+	margin: 0px;
+	margin-bottom: 2px;
+	font-weight:bold;
+}
+
+.ui-widget-header{
+	background: #035D2D;
+	border-color: #035D2D;
+}
 /*muted override*/
 .muted {
 	color: #49D98C;

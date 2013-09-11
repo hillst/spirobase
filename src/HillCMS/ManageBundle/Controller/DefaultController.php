@@ -148,7 +148,8 @@ class DefaultController extends Controller
     	return new Response("Successfully added user " . $username . " " . $role .". Reload your page to modify the user.");
     }
     
-    function addThingAction(){
+    function addThingAction()
+    {
     	/*
     	 * Get POST data
     	 * make sure user can edit this page (from form)
@@ -369,6 +370,40 @@ class DefaultController extends Controller
     	$em->flush();
     	return new Response("Success! Role for " . $user[0]->getUsername() . " changed to ". $role . ".");
     	 
+    }
+    
+    function deleteThingAction()
+    {
+    	$request = $this->getRequest();
+    	if($request->getMethod() != "POST"){
+    		return new Response("Not permitted", 403);
+    	}	
+    	$groupnum = $request->get("groupnum");
+    	if($groupnum == ""){
+    		return new Response("Bad form submission." , 400);
+    	}
+    	//not exactly this.. but compare to the page permissions
+    	$em = $this->getDoctrine()->getManager();
+    	$repo = $em->getRepository("HillCMSManageBundle:CmsPageThings");
+    	$things = $repo->findBy(array("groupnum" => $groupnum));
+    	if (sizeof($things) < 1){
+    		return new Response("Bad form submission.", 400);
+    	}
+    	
+    	if( !$this->get("security.context")->isGranted("ROLE_ADMIN") ){
+	    	foreach($things as $thing){
+	    		if ($thing->getPageid()->getRoleAllowed() !== "ROLE_USER"){
+	    			return new Response("Not permitted", 403);
+	    		}
+	    	}
+    	}
+    	//delete objects..
+    	foreach($things as $thing){
+    		$em->remove($thing);    		
+    	}    	
+    	$em->flush();
+    	return $this->redirect($this->get('router')->generate('manage'));
+   
     }
     
     

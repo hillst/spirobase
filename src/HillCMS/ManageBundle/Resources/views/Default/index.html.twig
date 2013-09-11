@@ -12,7 +12,12 @@
 		{% for pages in allowed_pages %}
 			<div class="tab-pane {% if first == 0 %}active{% endif %}" id="{{ pages["page"].Name }}">
             	{% for groups in pages["page_things"] %}
-            		<h2>{{ (groups[0].Thingname|split('-'))[0] }}</h2>
+            		<h2>{{ (groups[0].Thingname|split('-'))[0] }} - 
+            				<form class="deletething" style="display: inline" action="{{ path("deletething") }}" method ="POST">
+            					<input type="hidden" value="{{ groups[0].groupnum }}" name="groupnum">
+								<input type="submit" value="Delete" class="btn-delete"/>
+							</form>
+					</h2>
             		{% for things in groups %}
 	            		<h4>{{(things.Thingname|split('-'))[1] }}</h4>
 	            		<p>
@@ -153,14 +158,15 @@ function ajaxWithAlert(event, path, form){
 	event.preventDefault();
 };
 
-	$(document).ready(function() {
-     $('.editable').editable('{{ path('save')}}', {
-         indicator : 'Saving...',
-         tooltip   : 'Click to edit.',
-         type      : 'textarea',
-         cancel    : 'Cancel',
-         submit    : 'OK' 
-     });
+
+$(document).ready(function() {
+	$('.editable').editable('{{ path('save')}}', {
+		indicator : 'Saving...',
+		tooltip   : 'Click to edit.',
+		type      : 'textarea',
+		cancel    : 'Cancel',
+		submit    : 'OK'
+    });
 	//bind for each edit option
 	$(".changepass").submit(function(event){
 		ajaxWithAlert(event, '{{ path("changepass") }}', $(this) ) 
@@ -178,9 +184,12 @@ function ajaxWithAlert(event, path, form){
 			ajaxWithAlert(event, '{{ path("editusername") }}', $(this) ) 
 		}); 
 	{% endif %}
-	
-	
-         
+	//confirmation dialog
+	$(".deletething").submit(function(event){
+		if(!confirm('Are you sure you want to delete this?')){
+			return false;
+		}
+	}); 
  });
 </script>
 {% endblock %}

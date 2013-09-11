@@ -2,6 +2,7 @@
 To install, make sure you install the standard symfony requirements. Once installed, you will need to
 build the base mysql database.
 The seed.sql provided will build a database with the sample web app included.
+hillcms.sql contains just the structure of the database.
 
 Important path:
 
@@ -29,10 +30,14 @@ If you want to upload files to the server, this should be done manually. All fil
 #Important Notes#
 parameters.yml is not included or configured. This file is in the app/config directory and is required for connection to the database.
 
-Be sure to use base.sql to seed your database, it contains two default users, admin and user. Both user's passwords are password. Neither have an associated salt.
+Be sure to use base.sql to seed your database, it contains two default users, admin and user. Both user's passwords are password.
+admin
+password
+
+user
+password
 
 #Adding Users and Security Notes#
-
 The site should also be configured to use https for the manage page and login pages. In app/config/security.yml there is a setting that is commented out requiring for https. Additionally apache may need to be configured.
 
 By adding users from the manage page on the admin account, you can easily create new admins. As of now there is no way to remove users without manually editing the database.

@@ -22,3 +22,6 @@ addthing:
 editusername:
     pattern: /manage/editusername
     defaults: {_controller:HillCMSManageBundle:Default:editusername}
+deletething:
+    pattern: /manage/deletething
+    defaults: {_controller:HillCMSManageBundle:Default:deletething}
