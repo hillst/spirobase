@@ -1,3 +1,7 @@
+hill_cms_spirodela:
+    resource: "@HillCMSSpirodelaBundle/Resources/config/routing.yml"
+    prefix:   /
+
 hill_cms_manage:
     resource: "@HillCMSManageBundle/Resources/config/routing.yml"
     prefix:   /
@@ -10,7 +14,4 @@ hill_cms_user:
     resource: "@HillCMSUserBundle/Resources/config/routing.yml"
     prefix:   /
 
-hill_cmsccbl:
-    resource: "@HillCMSCCBLBundle/Resources/config/routing.yml"
-    prefix:   /
 

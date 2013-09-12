@@ -1,0 +1,42 @@
+{%  extends "HillCMSSpirodelaBundle:Default:bootstrap3-template.html.twig" %}
+{% block body %}
+		
+		<div class="container">
+			{# Use of the foreach here is just a technicality to get the main group without magic#}
+		`	{% for m in main %}
+				<div class="jumbotron" style="height:100%">
+					<h1>{{ m["Header"] }}</h1>
+					 {{ m["Block"] | raw}}
+				</div>
+			{% endfor %}
+			
+		</div>	
+{% endblock %}
+{% block footer %}
+	{% include "HillCMSSpirodelaBundle:Default:footer-template.html.twig"%}
+{% endblock %}
+{% block javascript %}
+<script type="text/javascript">
+	$(document).ready(function(){
+		//set footer heights
+		var heights = $(".footer-section").map(function (){
+			        return $(this).height();
+				}).get(),
+
+		maxHeight = Math.max.apply(null, heights);
+		$(".footer-section").height(maxHeight);
+
+		$(document).scroll(function(){
+			if($(".banner").height() - $(".navbar").height() < $(document).scrollTop()){
+				$(".navbar").css("top", "0px");
+				$(".navbar").addClass("navbar-fixed-top");
+				console.log("stick");
+			}
+			else{
+				$(".navbar").css("top", "247px");
+				$(".navbar").removeClass("navbar-fixed-top");
+			}
+		})
+	});
+</script>
+{% endblock %}

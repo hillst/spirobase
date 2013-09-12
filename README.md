@@ -10,6 +10,10 @@ Important path:
 */app_dev.php/people		Page using a foreach on groups to give an example.
 */app_dev.php/home		Page that uses two different heading prefixes to organize pagethings.
 
+#Configuring a fresh website#
+First you will need to register a new bundle. When that is done, you must remove the registered CCBL bundle.
+You must remove CCBL from the app/config/routing.yml file as well.
+
 #Purpose#
 The goal of this app is to create some middle ground for a CMS and a framework. This is primarly designed for developers, with the ability to allow user end text and selective feature editing. All styling should be done through straight CSS and HTML using the underlying symfony framework.
 

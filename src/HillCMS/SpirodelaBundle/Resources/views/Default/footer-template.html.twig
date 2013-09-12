@@ -1,0 +1,33 @@
+<footer>
+	<div class="container footer-container">
+		<div class="col-md-3 footer-section">
+			<h3>Resources</h3>
+			{% for resource in resources %}
+				<strong>
+				{{ resource["Content"]|raw }}
+				</strong>
+			{% endfor %}
+		</div> 
+		<div class="col-md-1"></div>
+		<div class="col-md-3 footer-section">
+				<h3>Site Map</h3>
+				<strong><a href="{{ path("home") }}">Home</a></strong><br/>
+				<a href="ftp://ftp.spirobase.ddpsc.org">FTP</a><br/>
+				<a href="{{ path("jbrowse") }}">JBrowse</a><br/>
+				<a href="{{ path("blast") }}">BLAST</a><br/>
+				<a href="{{ path("blat") }}">BLAT</a><br/>
+		</div>
+		<div class="col-md-1"></div>
+		<div class="col-md-3 footer-section">
+				<h3>Contact Us</h3>
+				{% for contact in contacts %}
+					{{ contact["Content"] | raw}}
+				{% endfor %}
+		</div>
+		
+	</div>
+	<div class = "container footer-footer">
+		&copy; 2013 Donald Danforth Plant Science
+			Center
+	</div>
+</footer>

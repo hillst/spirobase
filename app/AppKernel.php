@@ -16,10 +16,10 @@ class AppKernel extends Kernel
             new Symfony\Bundle\AsseticBundle\AsseticBundle(),
             new Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
-            new HillCMS\CCBLBundle\HillCMSCCBLBundle(),
             new HillCMS\UserBundle\HillCMSUserBundle(),
             new HillCMS\SecurityBundle\HillCMSSecurityBundle(),
             new HillCMS\ManageBundle\HillCMSManageBundle(),
+            new HillCMS\SpirodelaBundle\HillCMSSpirodelaBundle(),
 	);
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {

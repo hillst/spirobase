@@ -1,0 +1,20 @@
+home:
+    pattern:  /home
+    defaults: { _controller: HillCMSSpirodelaBundle:Default:index }
+login:
+    pattern:   /login
+    defaults:  { _controller: HillCMSSecurityBundle:Security:login }
+login_check:
+    pattern:   /login_check
+logout:
+    pattern: /logout
+jbrowse:
+    pattern: /jbrowse
+    defaults: { _controller: HillCMSSpirodelaBundle:JBrowse:index }
+blast:
+    pattern: /blast
+    defaults: { _controller: HillCMSSpirodelaBundle:Blast:index }
+blat:
+    pattern: /blat
+    defaults: { _controller: HillCMSSpirodelaBundle:Blat:index }
+
