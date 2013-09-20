@@ -72,9 +72,10 @@ footer{
 	color: #035D2d;
 }
 .footer-section h3{
-	text-decoration: underline;
+	border-bottom: #047A3C 1px solid;
 }
 .footer-container{
+	padding-top: 22px;
 	height: 100%;
 }
 .footer-footer{
@@ -128,7 +129,7 @@ input {
 }
 
 .navbar-fixed-banner{
-	top: 247px;
+	top: 248px;
 	border-left: 0px;
 	border-right: 0px;
 }

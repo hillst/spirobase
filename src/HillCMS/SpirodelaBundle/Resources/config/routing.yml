@@ -1,5 +1,5 @@
 home:
-    pattern:  /home
+    pattern:  /
     defaults: { _controller: HillCMSSpirodelaBundle:Default:index }
 login:
     pattern:   /login

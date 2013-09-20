@@ -9,7 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use HillCMS\ManageBundle\Entity\CmsPage;
 use HillCMS\ManageBundle\Entity\CmsPageThings; 
 
-class DefaultController extends CMSController
+class JBrowseController extends CMSController
 {
 	private $pid = 3;
 	
@@ -24,9 +24,7 @@ class DefaultController extends CMSController
     	}
     	$newsgroups = $this->buildPageGroups($pagethings);
     	
-    	return $this->render('HillCMSSpirodelaBundle:Default:index.html.twig', array( "main" => $newsgroups["Main"],
-    																				  "contacts" => $newsgroups["Contact"], 
-    																				  "resources" => $newsgroups["Resources"]));
+    	return $this->render('HillCMSSpirodelaBundle:Default:jbrowse.html.twig', array("contacts" => $newsgroups["Contact"], "resources" => $newsgroups["Resources"]));
     	
     }
 }

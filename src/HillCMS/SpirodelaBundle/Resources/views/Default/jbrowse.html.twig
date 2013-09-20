@@ -1,18 +1,8 @@
 {%  extends "HillCMSSpirodelaBundle:Default:bootstrap3-template.html.twig" %}
 {% block body %}
-		
-		<div class="container">
-			{# Use of the foreach here is just a technicality to get the main group without magic#}
-		`	{% for m in main %}
-				<div class="jumbotron" style="height:100%">
-					<h1>{{ m["Header"] }}</h1>
-					<p>
-					 {{ m["Block"] | raw}}
-					</p>
-				</div>
-			{% endfor %}
-			
-		</div>	
+    <div class="container">
+	    <iframe style="min-height:100%; width:100%"src="http://{{app.request.host}}/index.html?data=sample_data/json/volvox"></iframe>
+    </div>		
 {% endblock %}
 {% block footer %}
 	{% include "HillCMSSpirodelaBundle:Default:footer-template.html.twig"%}
